@@ -2,30 +2,44 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>LTE Link Quality Rater</title>
+    <title>LTE Link Quality Rater - Industry Standards</title>
     <style>
-        body { font-family: monospace; max-width: 600px; margin: 50px auto; padding: 20px; }
-        input { width: 100px; padding: 5px; margin: 5px; }
-        button { padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer; }
-        .rating { font-weight: bold; padding: 10px; margin: 10px 0; border-radius: 5px; }
-        .great { background: #d4edda; color: #155724; }
-        .good { background: #d1ecf1; color: #0c5460; }
-        .fair { background: #fff3cd; color: #856404; }
-        .poor, .bad { background: #f8d7da; color: #721c24; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        body { font-family: monospace; max-width: 700px; margin: 50px auto; padding: 20px; background: #f8f9fa; }
+        input { width: 120px; padding: 8px; margin: 5px; border: 1px solid #ddd; border-radius: 4px; }
+        button { padding: 12px 24px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #218838; }
+        .rating { font-weight: bold; padding: 12px; margin: 12px 0; border-radius: 6px; text-align: center; }
+        .excellent { background: #d4edda; color: #155724; border: 2px solid #28a745; }
+        .good { background: #d1ecf1; color: #0c5460; border: 2px solid #17a2b8; }
+        .fair { background: #fff3cd; color: #856404; border: 2px solid #ffc107; }
+        .poor { background: #f8d7da; color: #721c24; border: 2px solid #dc3545; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background: #007bff; color: white; }
+        #standards { background: #e9ecef; padding: 15px; border-radius: 6px; margin-bottom: 20px; font-size: 0.9em; }
+        h1 { color: #007bff; text-align: center; }
     </style>
 </head>
 <body>
-    <h1>LTE Modem Link Quality Rater</h1>
-    <p>Enter values from your modem. Click "Rate" for per-metric and overall rating. This is a dumb tool, don't expect much.</p>
+    <h1>📡 LTE Signal Quality Rater</h1>
+    <p>Industry-standard ratings for Digi/Palo Alto/etc. modems. Enter values and get per-metric + overall score.</p>
+    
+    <div id="standards">
+        <strong>Ranges used:</strong><br>
+        RSSI: Excellent ≤-65, Good -65--75, Fair -75--85, Poor >-85<br>
+        RSRP: Excellent ≥-80, Good -80--95, Fair -95--105, Poor ≤-105<br>
+        RSRQ: Excellent ≥-6, Good -6--10, Fair -10--15, Poor ≤-15<br>
+        SINR: Excellent ≥25, Good 20-25, Fair 13-20, Poor <13<br>
+        SNR: Excellent ≥25, Good 18-25, Fair 10-18, Poor <10 [web:1][web:2][web:27]
+    </div>
     
     <form id="signalForm">
-        <label>RSSI (dBm): <input type="number" id="rssi" step="0.1" placeholder="-74" required></label><br>
-        <label>RSRP (dBm): <input type="number" id="rsrp" step="0.1" placeholder="-105" required></label><br>
-        <label>RSRQ (dB): <input type="number" id="rsrq" step="0.1" placeholder="-13" required></label><br>
-        <label>SINR (dB): <input type="number" id="sinr" step="0.1" placeholder="9" required></label><br>
-        <button type="submit">Rate Link</button>
+        <label>RSSI (dBm): <input type="number" id="rssi" step="0.1" placeholder="-65"></label><br>
+        <label>RSRP (dBm): <input type="number" id="rsrp" step="0.1" placeholder="-101"></label><br>
+        <label>RSRQ (dB): <input type="number" id="rsrq" step="0.1" placeholder="-13"></label><br>
+        <label>SINR (dB): <input type="number" id="sinr" step="0.1" placeholder="6.4"></label><br>
+        <label>SNR (dB): <input type="number" id="snr" step="0.1" placeholder="10.8"></label><br>
+        <button type="submit">Rate Signal</button>
     </form>
     
     <div id="results"></div>
@@ -34,67 +48,71 @@
         document.getElementById('signalForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const rssi = parseFloat(document.getElementById('rssi').value);
-            const rsrp = parseFloat(document.getElementById('rsrp').value);
-            const rsrq = parseFloat(document.getElementById('rsrq').value);
-            const sinr = parseFloat(document.getElementById('sinr').value);
+            const vals = {
+                rssi: parseFloat(document.getElementById('rssi').value),
+                rsrp: parseFloat(document.getElementById('rsrp').value),
+                rsrq: parseFloat(document.getElementById('rsrq').value),
+                sinr: parseFloat(document.getElementById('sinr').value),
+                snr: parseFloat(document.getElementById('snr').value)
+            };
             
-            // Rate functions using your exact thresholds
-            function rateRSSI(val) {
-                if (val >= -75 && val <= -65) return {text: 'Good', class: 'good'};
-                if (val > -85 && val <= -75) return {text: 'Fair', class: 'fair'};
-                return {text: 'Poor', class: 'poor'};
+            // Industry standard rating functions
+            function rateRSSI(v) { 
+                if (v <= -65) return {text: 'Excellent', cls: 'excellent'};
+                if (v <= -75) return {text: 'Good', cls: 'good'};
+                if (v <= -85) return {text: 'Fair', cls: 'fair'};
+                return {text: 'Poor', cls: 'poor'};
+            }
+            function rateRSRP(v) {
+                if (v >= -80) return {text: 'Excellent', cls: 'excellent'};
+                if (v >= -95) return {text: 'Good', cls: 'good'};
+                if (v >= -105) return {text: 'Fair', cls: 'fair'};
+                return {text: 'Poor', cls: 'poor'};
+            }
+            function rateRSRQ(v) {
+                if (v >= -6) return {text: 'Excellent', cls: 'excellent'};
+                if (v >= -10) return {text: 'Good', cls: 'good'};
+                if (v >= -15) return {text: 'Fair', cls: 'fair'};
+                return {text: 'Poor', cls: 'poor'};
+            }
+            function rateSINR(v) {
+                if (v >= 25) return {text: 'Excellent', cls: 'excellent'};
+                if (v >= 20) return {text: 'Good', cls: 'good'};
+                if (v >= 13) return {text: 'Fair', cls: 'fair'};
+                return {text: 'Poor', cls: 'poor'};
+            }
+            function rateSNR(v) {
+                if (v >= 25) return {text: 'Excellent', cls: 'excellent'};
+                if (v >= 18) return {text: 'Good', cls: 'good'};
+                if (v >= 10) return {text: 'Fair', cls: 'fair'};
+                return {text: 'Poor', cls: 'poor'};
             }
             
-            function rateRSRP(val) {
-                if (val > -85) return {text: 'Great', class: 'great'};
-                if (val > -100) return {text: 'Good', class: 'good'};
-                return {text: 'Poor', class: 'poor'};
-            }
+            const rates = {
+                rssi: rateRSSI(vals.rssi),
+                rsrp: rateRSRP(vals.rsrp),
+                rsrq: rateRSRQ(vals.rsrq),
+                sinr: rateSINR(vals.sinr),
+                snr: rateSNR(vals.snr)
+            };
             
-            function rateRSRQ(val) {
-                if (val > -5) return {text: 'Great', class: 'great'};
-                if (val >= -8) return {text: 'Good', class: 'good'};
-                return {text: 'Bad', class: 'bad'};
-            }
+            // Overall: weighted (RSRP/RSRQ/SINR heavy)
+            const poorCount = Object.values(rates).filter(r => r.cls === 'poor').length;
+            const fairCount = Object.values(rates).filter(r => r.cls === 'fair').length;
+            let overall = 'Excellent'; let cls = 'excellent';
+            if (poorCount >= 1 || fairCount >= 3) { overall = 'Fair'; cls = 'fair'; }
+            if (poorCount >= 2 || fairCount >= 4) { overall = 'Poor'; cls = 'poor'; }
             
-            function rateSINR(val) {
-                if (val > 20) return {text: 'Great', class: 'great'};
-                if (val >= 13) return {text: 'Good', class: 'good'};
-                if (val >= 0) return {text: 'Fair/Poor', class: 'fair'};
-                return {text: 'Very Poor', class: 'poor'};
-            }
-            
-            const rssiRate = rateRSSI(rssi);
-            const rsrpRate = rateRSRP(rsrp);
-            const rsrqRate = rateRSRQ(rsrq);
-            const sinrRate = rateSINR(sinr);
-            
-            // Overall: count bad/poor/fair
-            const poorCount = [rssiRate.class, rsrpRate.class, rsrqRate.class, sinrRate.class]
-                .filter(c => c === 'poor' || c === 'bad').length;
-            const fairCount = [rssiRate.class, rsrpRate.class, rsrqRate.class, sinrRate.class]
-                .filter(c => c === 'fair').length;
-            
-            let overall = 'Great';
-            let overallClass = 'great';
-            if (poorCount >= 2) { overall = 'Poor'; overallClass = 'poor'; }
-            else if (poorCount >= 1 || fairCount >= 2) { overall = 'Fair'; overallClass = 'fair'; }
-            else if (fairCount >= 1) { overall = 'Good'; overallClass = 'good'; }
-            
-            // Output
             let html = `
-                <div class="rating ${rssiRate.class}">RSSI ${rssi} dBm: ${rssiRate.text}</div>
-                <div class="rating ${rsrpRate.class}">RSRP ${rsrp} dBm: ${rsrpRate.text}</div>
-                <div class="rating ${rsrqRate.class}">RSRQ ${rsrq} dB: ${rsrqRate.text}</div>
-                <div class="rating ${sinrRate.class}">SINR ${sinr} dB: ${sinrRate.text}</div>
-                <h3>Overall Link Quality: <span class="rating ${overallClass}">${overall}</span></h3>
+                <h3>Overall: <span class="rating ${cls}">${overall}</span></h3>
+                <div class="rating ${rates.rssi.cls}">RSSI ${vals.rssi || '?'}: ${rates.rssi.text}</div>
+                <div class="rating ${rates.rsrp.cls}">RSRP ${vals.rsrp || '?'}: ${rates.rsrp.text}</div>
+                <div class="rating ${rates.rsrq.cls}">RSRQ ${vals.rsrq || '?'}: ${rates.rsrq.text}</div>
+                <div class="rating ${rates.sinr.cls}">SINR ${vals.sinr || '?'}: ${rates.sinr.text}</div>
+                <div class="rating ${rates.snr.cls}">SNR ${vals.snr || '?'}: ${rates.snr.text}</div>
                 <table>
                     <tr><th>Metric</th><th>Value</th><th>Rating</th></tr>
-                    <tr><td>RSSI</td><td>${rssi}</td><td>${rssiRate.text}</td></tr>
-                    <tr><td>RSRP</td><td>${rsrp}</td><td>${rsrpRate.text}</td></tr>
-                    <tr><td>RSRQ</td><td>${rsrq}</td><td>${rsrqRate.text}</td></tr>
-                    <tr><td>SINR</td><td>${sinr}</td><td>${sinrRate.text}</td></tr>
+                    ${Object.entries(rates).map(([k, r]) => `<tr><td>${k.toUpperCase()}</td><td>${vals[k.toLowerCase()] || '?'}</td><td>${r.text}</td></tr>`).join('')}
                 </table>
             `;
             document.getElementById('results').innerHTML = html;
