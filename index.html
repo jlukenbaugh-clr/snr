@@ -2,26 +2,100 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>LTE Link Quality Rater - Industry Standards</title>
     <style>
-        body { font-family: monospace; max-width: 700px; margin: 50px auto; padding: 20px; background: #f8f9fa; }
-        input { width: 120px; padding: 8px; margin: 5px; border: 1px solid #ddd; border-radius: 4px; }
-        button { padding: 12px 24px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        :root {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #2d2d2d;
+            --text-primary: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --border: #444;
+            --excellent-bg: #1b5e20;
+            --excellent-text: #c8e6c9;
+            --good-bg: #1a4a5e;
+            --good-text: #b3e5fc;
+            --fair-bg: #f57c00;
+            --fair-text: #fff3e0;
+            --poor-bg: #b71c1c;
+            --poor-text: #ffcdd2;
+        }
+        [data-theme="light"] {
+            --bg-primary: #f8f9fa;
+            --bg-secondary: #e9ecef;
+            --text-primary: #212529;
+            --text-secondary: #6c757d;
+            --border: #ddd;
+            --excellent-bg: #d4edda;
+            --excellent-text: #155724;
+            --good-bg: #d1ecf1;
+            --good-text: #0c5460;
+            --fair-bg: #fff3cd;
+            --fair-text: #856404;
+            --poor-bg: #f8d7da;
+            --poor-text: #721c24;
+        }
+        body { 
+            font-family: 'Courier New', monospace; 
+            max-width: 700px; 
+            margin: 50px auto; 
+            padding: 20px; 
+            background: var(--bg-primary); 
+            color: var(--text-primary); 
+            transition: all 0.3s ease;
+        }
+        input { 
+            width: 120px; padding: 8px; margin: 5px; 
+            border: 1px solid var(--border); 
+            border-radius: 4px; 
+            background: var(--bg-secondary); 
+            color: var(--text-primary);
+        }
+        button { 
+            padding: 12px 24px; 
+            background: #28a745; 
+            color: white; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            margin: 5px;
+        }
         button:hover { background: #218838; }
-        .rating { font-weight: bold; padding: 12px; margin: 12px 0; border-radius: 6px; text-align: center; }
-        .excellent { background: #d4edda; color: #155724; border: 2px solid #28a745; }
-        .good { background: #d1ecf1; color: #0c5460; border: 2px solid #17a2b8; }
-        .fair { background: #fff3cd; color: #856404; border: 2px solid #ffc107; }
-        .poor { background: #f8d7da; color: #721c24; border: 2px solid #dc3545; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        #themeToggle { background: #6c757d; font-size: 0.9em; float: right; }
+        #themeToggle:hover { background: #5a6268; }
+        .rating { 
+            font-weight: bold; padding: 12px; margin: 12px 0; 
+            border-radius: 6px; text-align: center; 
+            border: 2px solid;
+        }
+        .excellent { background: var(--excellent-bg); color: var(--excellent-text); border-color: #4caf50; }
+        .good { background: var(--good-bg); color: var(--good-text); border-color: #2196f3; }
+        .fair { background: var(--fair-bg); color: var(--fair-text); border-color: #ff9800; }
+        .poor { background: var(--poor-bg); color: var(--poor-text); border-color: #f44336; }
+        table { 
+            width: 100%; border-collapse: collapse; margin-top: 20px; 
+            background: var(--bg-secondary); 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3); 
+            border-radius: 6px; overflow: hidden;
+        }
+        th, td { border: 1px solid var(--border); padding: 12px; text-align: left; }
         th { background: #007bff; color: white; }
-        #standards { background: #e9ecef; padding: 15px; border-radius: 6px; margin-bottom: 20px; font-size: 0.9em; }
-        h1 { color: #007bff; text-align: center; }
+        #standards { 
+            background: var(--bg-secondary); 
+            padding: 15px; border-radius: 6px; 
+            margin-bottom: 20px; font-size: 0.9em; 
+            border-left: 4px solid #007bff;
+        }
+        h1 { color: #007bff; text-align: center; margin-bottom: 10px; }
+        .header { display: flex; justify-content: space-between; align-items: center; }
     </style>
 </head>
-<body>
-    <h1>📡 LTE Signal Quality Rater</h1>
+<body data-theme="dark">
+    <div class="header">
+        <h1>📡 LTE Signal Quality Rater</h1>
+        <button id="themeToggle">☀️ Light</button>
+    </div>
     <p>Industry-standard ratings for Digi/Palo Alto/etc. modems. Enter values and get per-metric + overall score.</p>
     
     <div id="standards">
@@ -34,17 +108,33 @@
     </div>
     
     <form id="signalForm">
-        <label>RSSI (dBm): <input type="number" id="rssi" step="0.1" placeholder="-65"></label><br>
-        <label>RSRP (dBm): <input type="number" id="rsrp" step="0.1" placeholder="-101"></label><br>
         <label>RSRQ (dB): <input type="number" id="rsrq" step="0.1" placeholder="-13"></label><br>
-        <label>SINR (dB): <input type="number" id="sinr" step="0.1" placeholder="6.4"></label><br>
+        <label>RSRP (dBm): <input type="number" id="rsrp" step="0.1" placeholder="-101"></label><br>
+        <label>RSSI (dBm): <input type="number" id="rssi" step="0.1" placeholder="-65"></label><br>
         <label>SNR (dB): <input type="number" id="snr" step="0.1" placeholder="10.8"></label><br>
+        <label>SINR (dB): <input type="number" id="sinr" step="0.1" placeholder="6.4"></label><br>
         <button type="submit">Rate Signal</button>
     </form>
     
     <div id="results"></div>
 
     <script>
+        // Dark mode toggle
+        const toggle = document.getElementById('themeToggle');
+        toggle.addEventListener('click', () => {
+            const body = document.body;
+            const isDark = body.getAttribute('data-theme') === 'dark';
+            body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            toggle.textContent = isDark ? '🌙 Dark' : '☀️ Light';
+            localStorage.setItem('theme', body.getAttribute('data-theme'));
+        });
+        
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.body.setAttribute('data-theme', savedTheme);
+        toggle.textContent = savedTheme === 'dark' ? '☀️ Light' : '🌙 Dark';
+        
+        // Form handler (unchanged)
         document.getElementById('signalForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -56,7 +146,6 @@
                 snr: parseFloat(document.getElementById('snr').value)
             };
             
-            // Industry standard rating functions
             function rateRSSI(v) { 
                 if (v <= -65) return {text: 'Excellent', cls: 'excellent'};
                 if (v <= -75) return {text: 'Good', cls: 'good'};
@@ -96,7 +185,6 @@
                 snr: rateSNR(vals.snr)
             };
             
-            // Overall: weighted (RSRP/RSRQ/SINR heavy)
             const poorCount = Object.values(rates).filter(r => r.cls === 'poor').length;
             const fairCount = Object.values(rates).filter(r => r.cls === 'fair').length;
             let overall = 'Excellent'; let cls = 'excellent';
@@ -105,14 +193,18 @@
             
             let html = `
                 <h3>Overall: <span class="rating ${cls}">${overall}</span></h3>
-                <div class="rating ${rates.rssi.cls}">RSSI ${vals.rssi || '?'}: ${rates.rssi.text}</div>
-                <div class="rating ${rates.rsrp.cls}">RSRP ${vals.rsrp || '?'}: ${rates.rsrp.text}</div>
                 <div class="rating ${rates.rsrq.cls}">RSRQ ${vals.rsrq || '?'}: ${rates.rsrq.text}</div>
-                <div class="rating ${rates.sinr.cls}">SINR ${vals.sinr || '?'}: ${rates.sinr.text}</div>
+                <div class="rating ${rates.rsrp.cls}">RSRP ${vals.rsrp || '?'}: ${rates.rsrp.text}</div>
+                <div class="rating ${rates.rssi.cls}">RSSI ${vals.rssi || '?'}: ${rates.rssi.text}</div>
                 <div class="rating ${rates.snr.cls}">SNR ${vals.snr || '?'}: ${rates.snr.text}</div>
+                <div class="rating ${rates.sinr.cls}">SINR ${vals.sinr || '?'}: ${rates.sinr.text}</div>
                 <table>
                     <tr><th>Metric</th><th>Value</th><th>Rating</th></tr>
-                    ${Object.entries(rates).map(([k, r]) => `<tr><td>${k.toUpperCase()}</td><td>${vals[k.toLowerCase()] || '?'}</td><td>${r.text}</td></tr>`).join('')}
+                    <tr><td>RSRQ</td><td>${vals.rsrq || '?'}</td><td>${rates.rsrq.text}</td></tr>
+                    <tr><td>RSRP</td><td>${vals.rsrp || '?'}</td><td>${rates.rsrp.text}</td></tr>
+                    <tr><td>RSSI</td><td>${vals.rssi || '?'}</td><td>${rates.rssi.text}</td></tr>
+                    <tr><td>SNR</td><td>${vals.snr || '?'}</td><td>${rates.snr.text}</td></tr>
+                    <tr><td>SINR</td><td>${vals.sinr || '?'}</td><td>${rates.sinr.text}</td></tr>
                 </table>
             `;
             document.getElementById('results').innerHTML = html;
