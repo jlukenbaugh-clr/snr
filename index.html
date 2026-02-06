@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>LTE Link Quality Rater</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LTE Link Quality Rater - Industry Standards</title>
     <style>
         :root {
             --bg-primary: #1a1a1a;
@@ -20,6 +20,7 @@
             --poor-bg: #b71c1c;
             --poor-text: #ffcdd2;
         }
+
         [data-theme="light"] {
             --bg-primary: #f8f9fa;
             --bg-secondary: #e9ecef;
@@ -35,87 +36,163 @@
             --poor-bg: #f8d7da;
             --poor-text: #721c24;
         }
-        body { 
-            font-family: 'Courier New', monospace; 
-            max-width: 700px; 
-            margin: 50px auto; 
-            padding: 20px; 
-            background: var(--bg-primary); 
-            color: var(--text-primary); 
+
+        body {
+            font-family: 'Courier New', monospace;
+            max-width: 700px;
+            margin: 50px auto;
+            padding: 20px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
             transition: all 0.3s ease;
         }
-        input { 
-            width: 120px; padding: 8px; margin: 5px; 
-            border: 1px solid var(--border); 
-            border-radius: 4px; 
-            background: var(--bg-secondary); 
+
+        input, select {
+            width: 120px;
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background: var(--bg-secondary);
             color: var(--text-primary);
         }
-        button { 
-            padding: 12px 24px; 
-            background: #28a745; 
-            color: white; 
-            border: none; 
-            border-radius: 4px; 
-            cursor: pointer; 
-            font-weight: bold; 
+
+        button {
+            padding: 12px 24px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
             margin: 5px;
         }
-        button:hover { background: #218838; }
-        #themeToggle { background: #6c757d; font-size: 0.9em; float: right; }
-        #themeToggle:hover { background: #5a6268; }
-        .rating { 
-            font-weight: bold; padding: 12px; margin: 12px 0; 
-            border-radius: 6px; text-align: center; 
+
+        button:hover {
+            background: #218838;
+        }
+
+        #themeToggle {
+            background: #6c757d;
+            font-size: 0.9em;
+            float: right;
+        }
+
+        #themeToggle:hover {
+            background: #5a6268;
+        }
+
+        .rating {
+            font-weight: bold;
+            padding: 12px;
+            margin: 12px 0;
+            border-radius: 6px;
+            text-align: center;
             border: 2px solid;
         }
-        .excellent { background: var(--excellent-bg); color: var(--excellent-text); border-color: #4caf50; }
-        .good { background: var(--good-bg); color: var(--good-text); border-color: #2196f3; }
-        .fair { background: var(--fair-bg); color: var(--fair-text); border-color: #ff9800; }
-        .poor { background: var(--poor-bg); color: var(--poor-text); border-color: #f44336; }
-        table { 
-            width: 100%; border-collapse: collapse; margin-top: 20px; 
-            background: var(--bg-secondary); 
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3); 
-            border-radius: 6px; overflow: hidden;
+
+        .excellent {
+            background: var(--excellent-bg);
+            color: var(--excellent-text);
+            border-color: #4caf50;
         }
-        th, td { border: 1px solid var(--border); padding: 12px; text-align: left; }
-        th { background: #007bff; color: white; }
-        #standards { 
-            background: var(--bg-secondary); 
-            padding: 15px; border-radius: 6px; 
-            margin-bottom: 20px; font-size: 0.9em; 
+
+        .good {
+            background: var(--good-bg);
+            color: var(--good-text);
+            border-color: #2196f3;
+        }
+
+        .fair {
+            background: var(--fair-bg);
+            color: var(--fair-text);
+            border-color: #ff9800;
+        }
+
+        .poor {
+            background: var(--poor-bg);
+            color: var(--poor-text);
+            border-color: #f44336;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: var(--bg-secondary);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background: #007bff;
+            color: white;
+        }
+
+        #standards {
+            background: var(--bg-secondary);
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
             border-left: 4px solid #007bff;
         }
-        h1 { color: #007bff; text-align: center; margin-bottom: 10px; }
-        .header { display: flex; justify-content: space-between; align-items: center; }
+
+        h1 {
+            color: #007bff;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
     </style>
 </head>
 <body data-theme="dark">
     <div class="header">
-        <h1>📡 LTE Signal Quality Rater</h1>
-        <button id="themeToggle">☀️ Light</button>
+        <h1>LTE Signal Quality Rater</h1>
+        <button id="themeToggle">Light</button>
     </div>
-    <p>Industry-standard ratings for Digi/Palo Alto/etc. modems. Enter values and get per-metric + overall score.</p>
-    
+    <div>
+        <p>Industry-standard ratings for Digi/Palo Alto/etc. modems. Enter values and get per-metric + overall score.</p>
+    </div>
     <div id="standards">
-        <strong>Ranges used:</strong><br>
-        RSSI: Excellent ≤-65, Good -65--75, Fair -75--85, Poor >-85<br>
-        RSRP: Excellent ≥-80, Good -80--95, Fair -95--105, Poor ≤-105<br>
-        RSRQ: Excellent ≥-6, Good -6--10, Fair -10--15, Poor ≤-15<br>
-        SINR: Excellent ≥25, Good 20-25, Fair 13-20, Poor <13<br>
-        SNR: Excellent ≥25, Good 18-25, Fair 10-18, Poor <10 [web:1][web:2][web:27]
+        <strong>Ranges used</strong><br>
+        RSSI: Excellent ≤-65, Good -65--75, Fair -75--85, Poor ≥-85<br>
+        RSRP: Excellent ≤-80, Good -80--95, Fair -95--105, Poor ≥-105<br>
+        RSRQ: Excellent ≤-6, Good -6--10, Fair -10--15, Poor ≥-15<br>
+        SINR: Excellent ≥25, Good 20-25, Fair 13-20, Poor &lt;13<br>
+        SNR: Excellent ≥25, Good 18-25, Fair 10-18, Poor &lt;10
     </div>
-    
     <form id="signalForm">
-        <label>RSRQ (dB): <input type="number" id="rsrq" step="0.1" placeholder="-13"></label><br>
-        <label>RSRP (dBm): <input type="number" id="rsrp" step="0.1" placeholder="-101"></label><br>
-        <label>RSSI (dBm): <input type="number" id="rssi" step="0.1" placeholder="-65"></label><br>
-        <label>SNR (dB): <input type="number" id="snr" step="0.1" placeholder="10.8"></label><br>
-        <label>SINR (dB): <input type="number" id="sinr" step="0.1" placeholder="6.4"></label><br>
+        <label>RSRQ (dB) <input type="number" id="rsrq" step="0.1" placeholder="-13"></label><br>
+        <label>RSRP (dBm) <input type="number" id="rsrp" step="0.1" placeholder="-101"></label><br>
+        <label>RSSI (dBm) <input type="number" id="rssi" step="0.1" placeholder="-65"></label><br>
+        <label>SNR (dB) <input type="number" id="snr" step="0.1" placeholder="10.8"></label><br>
+        <label>SINR (dB) <input type="number" id="sinr" step="0.1" placeholder="6.4"></label><br>
+        <label>Provider 
+            <select id="provider">
+                <option value="">Select...</option>
+                <option value="AT&T">AT&T</option>
+                <option value="AT&T FirstNet">AT&T FirstNet</option>
+                <option value="Verizon">Verizon</option>
+            </select>
+        </label><br>
+        <label>Band <input type="text" id="band" placeholder="e.g., n71"></label><br>
+        <label>Signal Strength (dBm) <input type="number" id="sigstrength" step="0.1" placeholder="-85"></label><br>
+        <label>Signal Strength % <input type="number" id="sigstrengthpct" min="0" max="100" placeholder="45"></label><br>
         <button type="submit">Rate Signal</button>
     </form>
-    
     <div id="results"></div>
 
     <script>
@@ -125,58 +202,65 @@
             const body = document.body;
             const isDark = body.getAttribute('data-theme') === 'dark';
             body.setAttribute('data-theme', isDark ? 'light' : 'dark');
-            toggle.textContent = isDark ? '🌙 Dark' : '☀️ Light';
+            toggle.textContent = isDark ? 'Dark' : 'Light';
             localStorage.setItem('theme', body.getAttribute('data-theme'));
         });
-        
+
         // Load saved theme
         const savedTheme = localStorage.getItem('theme') || 'dark';
         document.body.setAttribute('data-theme', savedTheme);
-        toggle.textContent = savedTheme === 'dark' ? '☀️ Light' : '🌙 Dark';
-        
-        // Form handler (unchanged)
+        toggle.textContent = savedTheme === 'dark' ? 'Light' : 'Dark';
+
+        // Form handler
         document.getElementById('signalForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            
             const vals = {
                 rssi: parseFloat(document.getElementById('rssi').value),
                 rsrp: parseFloat(document.getElementById('rsrp').value),
                 rsrq: parseFloat(document.getElementById('rsrq').value),
                 sinr: parseFloat(document.getElementById('sinr').value),
-                snr: parseFloat(document.getElementById('snr').value)
+                snr: parseFloat(document.getElementById('snr').value),
+                provider: document.getElementById('provider').value,
+                band: document.getElementById('band').value,
+                sigstrength: parseFloat(document.getElementById('sigstrength').value) || null,
+                sigstrengthpct: parseFloat(document.getElementById('sigstrengthpct').value) || null
             };
-            
-            function rateRSSI(v) { 
-                if (v <= -65) return {text: 'Excellent', cls: 'excellent'};
-                if (v <= -75) return {text: 'Good', cls: 'good'};
-                if (v <= -85) return {text: 'Fair', cls: 'fair'};
-                return {text: 'Poor', cls: 'poor'};
+
+            function rateRSSI(v) {
+                if (v <= -65) return { text: 'Excellent', cls: 'excellent' };
+                if (v < -75) return { text: 'Good', cls: 'good' };
+                if (v < -85) return { text: 'Fair', cls: 'fair' };
+                return { text: 'Poor', cls: 'poor' };
             }
+
             function rateRSRP(v) {
-                if (v >= -80) return {text: 'Excellent', cls: 'excellent'};
-                if (v >= -95) return {text: 'Good', cls: 'good'};
-                if (v >= -105) return {text: 'Fair', cls: 'fair'};
-                return {text: 'Poor', cls: 'poor'};
+                if (v <= -80) return { text: 'Excellent', cls: 'excellent' };
+                if (v < -95) return { text: 'Good', cls: 'good' };
+                if (v < -105) return { text: 'Fair', cls: 'fair' };
+                return { text: 'Poor', cls: 'poor' };
             }
+
             function rateRSRQ(v) {
-                if (v >= -6) return {text: 'Excellent', cls: 'excellent'};
-                if (v >= -10) return {text: 'Good', cls: 'good'};
-                if (v >= -15) return {text: 'Fair', cls: 'fair'};
-                return {text: 'Poor', cls: 'poor'};
+                if (v <= -6) return { text: 'Excellent', cls: 'excellent' };
+                if (v < -10) return { text: 'Good', cls: 'good' };
+                if (v < -15) return { text: 'Fair', cls: 'fair' };
+                return { text: 'Poor', cls: 'poor' };
             }
+
             function rateSINR(v) {
-                if (v >= 25) return {text: 'Excellent', cls: 'excellent'};
-                if (v >= 20) return {text: 'Good', cls: 'good'};
-                if (v >= 13) return {text: 'Fair', cls: 'fair'};
-                return {text: 'Poor', cls: 'poor'};
+                if (v >= 25) return { text: 'Excellent', cls: 'excellent' };
+                if (v >= 20) return { text: 'Good', cls: 'good' };
+                if (v >= 13) return { text: 'Fair', cls: 'fair' };
+                return { text: 'Poor', cls: 'poor' };
             }
+
             function rateSNR(v) {
-                if (v >= 25) return {text: 'Excellent', cls: 'excellent'};
-                if (v >= 18) return {text: 'Good', cls: 'good'};
-                if (v >= 10) return {text: 'Fair', cls: 'fair'};
-                return {text: 'Poor', cls: 'poor'};
+                if (v >= 25) return { text: 'Excellent', cls: 'excellent' };
+                if (v >= 18) return { text: 'Good', cls: 'good' };
+                if (v >= 10) return { text: 'Fair', cls: 'fair' };
+                return { text: 'Poor', cls: 'poor' };
             }
-            
+
             const rates = {
                 rssi: rateRSSI(vals.rssi),
                 rsrp: rateRSRP(vals.rsrp),
@@ -184,29 +268,42 @@
                 sinr: rateSINR(vals.sinr),
                 snr: rateSNR(vals.snr)
             };
-            
+
             const poorCount = Object.values(rates).filter(r => r.cls === 'poor').length;
             const fairCount = Object.values(rates).filter(r => r.cls === 'fair').length;
-            let overall = 'Excellent'; let cls = 'excellent';
-            if (poorCount >= 1 || fairCount >= 3) { overall = 'Fair'; cls = 'fair'; }
-            if (poorCount >= 2 || fairCount >= 4) { overall = 'Poor'; cls = 'poor'; }
-            
-            let html = `
-                <h3>Overall: <span class="rating ${cls}">${overall}</span></h3>
-                <div class="rating ${rates.rsrq.cls}">RSRQ ${vals.rsrq || '?'}: ${rates.rsrq.text}</div>
-                <div class="rating ${rates.rsrp.cls}">RSRP ${vals.rsrp || '?'}: ${rates.rsrp.text}</div>
-                <div class="rating ${rates.rssi.cls}">RSSI ${vals.rssi || '?'}: ${rates.rssi.text}</div>
-                <div class="rating ${rates.snr.cls}">SNR ${vals.snr || '?'}: ${rates.snr.text}</div>
-                <div class="rating ${rates.sinr.cls}">SINR ${vals.sinr || '?'}: ${rates.sinr.text}</div>
+            let overall = 'Excellent';
+            let cls = 'excellent';
+            if (poorCount >= 1 || fairCount >= 3) {
+                overall = 'Fair';
+                cls = 'fair';
+            }
+            if (poorCount >= 2 || fairCount >= 4) {
+                overall = 'Poor';
+                cls = 'poor';
+            }
+
+            let html = `<h3>Overall <span class="rating ${cls}">${overall}</span></h3>
+                <div class="rating ${rates.rsrq.cls}">RSRQ: ${vals.rsrq ? rates.rsrq.text : ''}</div>
+                <div class="rating ${rates.rsrp.cls}">RSRP: ${vals.rsrp ? rates.rsrp.text : ''}</div>
+                <div class="rating ${rates.rssi.cls}">RSSI: ${vals.rssi ? rates.rssi.text : ''}</div>
+                <div class="rating ${rates.snr.cls}">SNR: ${vals.snr ? rates.snr.text : ''}</div>
+                <div class="rating ${rates.sinr.cls}">SINR: ${vals.sinr ? rates.sinr.text : ''}</div>
                 <table>
                     <tr><th>Metric</th><th>Value</th><th>Rating</th></tr>
-                    <tr><td>RSRQ</td><td>${vals.rsrq || '?'}</td><td>${rates.rsrq.text}</td></tr>
-                    <tr><td>RSRP</td><td>${vals.rsrp || '?'}</td><td>${rates.rsrp.text}</td></tr>
-                    <tr><td>RSSI</td><td>${vals.rssi || '?'}</td><td>${rates.rssi.text}</td></tr>
-                    <tr><td>SNR</td><td>${vals.snr || '?'}</td><td>${rates.snr.text}</td></tr>
-                    <tr><td>SINR</td><td>${vals.sinr || '?'}</td><td>${rates.sinr.text}</td></tr>
-                </table>
-            `;
+                    <tr><td>RSRQ</td><td>${vals.rsrq || ''}</td><td>${rates.rsrq.text}</td></tr>
+                    <tr><td>RSRP</td><td>${vals.rsrp || ''}</td><td>${rates.rsrp.text}</td></tr>
+                    <tr><td>RSSI</td><td>${vals.rssi || ''}</td><td>${rates.rssi.text}</td></tr>
+                    <tr><td>SNR</td><td>${vals.snr || ''}</td><td>${rates.snr.text}</td></tr>
+                    <tr><td>SINR</td><td>${vals.sinr || ''}</td><td>${rates.sinr.text}</td></tr>`;
+
+            if (vals.provider || vals.band || vals.sigstrength || vals.sigstrengthpct) {
+                html += `<tr><td>Provider</td><td>${vals.provider}</td><td>${vals.band}</td></tr>`;
+                if (vals.sigstrength || vals.sigstrengthpct) {
+                    html += `<tr><td>Signal Strength</td><td>${vals.sigstrength || ''}</td><td>${vals.sigstrengthpct ? vals.sigstrengthpct + '%' : ''}</td></tr>`;
+                }
+            }
+
+            html += '</table>';
             document.getElementById('results').innerHTML = html;
         });
     </script>
