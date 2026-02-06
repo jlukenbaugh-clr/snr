@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LTE Link Quality Rater - Industry Standards</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CLR LTE Link Quality Rater - Industry Standards</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         :root {
             --bg-primary: #1a1a1a;
@@ -20,7 +21,6 @@
             --poor-bg: #b71c1c;
             --poor-text: #ffcdd2;
         }
-
         [data-theme="light"] {
             --bg-primary: #f8f9fa;
             --bg-secondary: #e9ecef;
@@ -36,231 +36,360 @@
             --poor-bg: #f8d7da;
             --poor-text: #721c24;
         }
-
-        body {
-            font-family: 'Courier New', monospace;
-            max-width: 700px;
-            margin: 50px auto;
-            padding: 20px;
-            background: var(--bg-primary);
-            color: var(--text-primary);
+        body { 
+            font-family: 'Courier New', monospace; 
+            max-width: 900px; 
+            margin: 50px auto; 
+            padding: 20px; 
+            background: var(--bg-primary); 
+            color: var(--text-primary); 
             transition: all 0.3s ease;
         }
-
-        input, select {
-            width: 120px;
-            padding: 8px;
-            margin: 5px;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            background: var(--bg-secondary);
+        input { 
+            width: 120px; padding: 8px; margin: 5px; 
+            border: 1px solid var(--border); 
+            border-radius: 4px; 
+            background: var(--bg-secondary); 
             color: var(--text-primary);
         }
-
-        button {
-            padding: 12px 24px;
-            background: #28a745;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
+        button { 
+            padding: 12px 24px; 
+            background: #28a745; 
+            color: white; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-weight: bold; 
             margin: 5px;
         }
-
-        button:hover {
-            background: #218838;
-        }
-
-        #themeToggle {
-            background: #6c757d;
-            font-size: 0.9em;
-            float: right;
-        }
-
-        #themeToggle:hover {
-            background: #5a6268;
-        }
-
-        .rating {
-            font-weight: bold;
-            padding: 12px;
-            margin: 12px 0;
-            border-radius: 6px;
-            text-align: center;
+        button:hover { background: #218838; }
+        #themeToggle { background: #6c757d; font-size: 0.9em; float: right; }
+        #themeToggle:hover { background: #5a6268; }
+        #getTowers { background: #007bff; }
+        #getTowers:hover { background: #0056b3; }
+        #getLocation { background: #17a2b8; font-size: 0.85em; padding: 8px 16px; }
+        #getLocation:hover { background: #117a8b; }
+        .rating { 
+            font-weight: bold; padding: 12px; margin: 12px 0; 
+            border-radius: 6px; text-align: center; 
             border: 2px solid;
         }
-
-        .excellent {
-            background: var(--excellent-bg);
-            color: var(--excellent-text);
-            border-color: #4caf50;
+        .excellent { background: var(--excellent-bg); color: var(--excellent-text); border-color: #4caf50; }
+        .good { background: var(--good-bg); color: var(--good-text); border-color: #2196f3; }
+        .fair { background: var(--fair-bg); color: var(--fair-text); border-color: #ff9800; }
+        .poor { background: var(--poor-bg); color: var(--poor-text); border-color: #f44336; }
+        table { 
+            width: 100%; border-collapse: collapse; margin-top: 20px; 
+            background: var(--bg-secondary); 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3); 
+            border-radius: 6px; overflow: hidden;
         }
-
-        .good {
-            background: var(--good-bg);
-            color: var(--good-text);
-            border-color: #2196f3;
+        th, td { border: 1px solid var(--border); padding: 12px; text-align: left; }
+        th { background: #007bff; color: white; }
+        #standards { 
+            background: var(--bg-secondary); 
+            padding: 15px; border-radius: 6px; 
+            margin-bottom: 20px; font-size: 0.9em; 
+            border-left: 4px solid #007bff;
         }
-
-        .fair {
-            background: var(--fair-bg);
-            color: var(--fair-text);
-            border-color: #ff9800;
+        h1 { color: #007bff; text-align: center; margin-bottom: 10px; }
+        h3 { color: var(--text-primary); }
+        .header { display: flex; justify-content: space-between; align-items: center; }
+        .coord-group { 
+            background: var(--bg-secondary); 
+            padding: 15px; 
+            border-radius: 6px; 
+            margin: 15px 0;
+            border-left: 4px solid #17a2b8;
         }
-
-        .poor {
-            background: var(--poor-bg);
-            color: var(--poor-text);
-            border-color: #f44336;
+        #map { 
+            height: 500px; 
+            width: 100%; 
+            border-radius: 6px; 
+            margin: 20px 0;
+            border: 2px solid var(--border);
+            display: none;
         }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background: var(--bg-secondary);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-            border-radius: 6px;
-            overflow: hidden;
-        }
-
-        th, td {
-            border: 1px solid var(--border);
-            padding: 12px;
-            text-align: left;
-        }
-
-        th {
-            background: #007bff;
-            color: white;
-        }
-
-        #standards {
+        #towerInfo {
             background: var(--bg-secondary);
             padding: 15px;
             border-radius: 6px;
-            margin-bottom: 20px;
-            font-size: 0.9em;
-            border-left: 4px solid #007bff;
+            margin: 15px 0;
+            display: none;
         }
-
-        h1 {
-            color: #007bff;
+        .tower-item {
+            padding: 10px;
+            margin: 8px 0;
+            background: var(--bg-primary);
+            border-left: 3px solid #007bff;
+            border-radius: 4px;
+        }
+        .loading {
             text-align: center;
-            margin-bottom: 10px;
+            padding: 20px;
+            color: var(--text-secondary);
         }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .error {
+            background: var(--poor-bg);
+            color: var(--poor-text);
+            padding: 12px;
+            border-radius: 6px;
+            margin: 10px 0;
         }
     </style>
 </head>
 <body data-theme="dark">
     <div class="header">
-        <h1>LTE Signal Quality Rater</h1>
-        <button id="themeToggle">Light</button>
+        <h1>📡 LTE Signal Quality Rater</h1>
+        <button id="themeToggle">☀️ Light</button>
     </div>
-    <div>
-        <p>Industry-standard ratings for Digi/Palo Alto/etc. modems. Enter values and get per-metric + overall score.</p>
-    </div>
+    <p>Industry-standard ratings for Digi/Palo Alto/etc. modems. Enter values and get per-metric + overall score.</p>
+    
     <div id="standards">
-        <strong>Ranges used</strong><br>
-        RSSI: Excellent ≤-65, Good -65--75, Fair -75--85, Poor ≥-85<br>
-        RSRP: Excellent ≤-80, Good -80--95, Fair -95--105, Poor ≥-105<br>
-        RSRQ: Excellent ≤-6, Good -6--10, Fair -10--15, Poor ≥-15<br>
-        SINR: Excellent ≥25, Good 20-25, Fair 13-20, Poor &lt;13<br>
-        SNR: Excellent ≥25, Good 18-25, Fair 10-18, Poor &lt;10
+        <strong>Ranges used:</strong><br>
+        RSSI: Excellent ≤-65, Good -65→-75, Fair -75→-85, Poor >-85<br>
+        RSRP: Excellent ≥-80, Good -80→-95, Fair -95→-105, Poor ≤-105<br>
+        RSRQ: Excellent ≥-6, Good -6→-10, Fair -10→-15, Poor ≤-15<br>
+        SINR: Excellent ≥25, Good 20-25, Fair 13-20, Poor <13<br>
+        SNR: Excellent ≥25, Good 18-25, Fair 10-18, Poor <10
     </div>
+    
     <form id="signalForm">
-        <label>RSRQ (dB) <input type="number" id="rsrq" step="0.1" placeholder="-13"></label><br>
-        <label>RSRP (dBm) <input type="number" id="rsrp" step="0.1" placeholder="-101"></label><br>
-        <label>RSSI (dBm) <input type="number" id="rssi" step="0.1" placeholder="-65"></label><br>
-        <label>SNR (dB) <input type="number" id="snr" step="0.1" placeholder="10.8"></label><br>
-        <label>SINR (dB) <input type="number" id="sinr" step="0.1" placeholder="6.4"></label><br>
-        <label>Provider 
-            <select id="provider">
-                <option value="">Select...</option>
-                <option value="AT&T">AT&T</option>
-                <option value="AT&T FirstNet">AT&T FirstNet</option>
-                <option value="Verizon">Verizon</option>
-            </select>
-        </label><br>
-        <label>Band <input type="text" id="band" placeholder="e.g., n71"></label><br>
-        <label>Signal Strength (dBm) <input type="number" id="sigstrength" step="0.1" placeholder="-85"></label><br>
-        <label>Signal Strength % <input type="number" id="sigstrengthpct" min="0" max="100" placeholder="45"></label><br>
+        <label>RSRQ (dB): <input type="number" id="rsrq" step="0.1" placeholder="-13"></label><br>
+        <label>RSRP (dBm): <input type="number" id="rsrp" step="0.1" placeholder="-101"></label><br>
+        <label>RSSI (dBm): <input type="number" id="rssi" step="0.1" placeholder="-65"></label><br>
+        <label>SNR (dB): <input type="number" id="snr" step="0.1" placeholder="10.8"></label><br>
+        <label>SINR (dB): <input type="number" id="sinr" step="0.1" placeholder="6.4"></label><br>
         <button type="submit">Rate Signal</button>
     </form>
+    
+    <div class="coord-group">
+        <strong>📍 Location Coordinates</strong>
+        <button id="getLocation">Get Current Location</button><br>
+        <label>Latitude: <input type="number" id="latitude" step="0.000001" placeholder="36.4266"></label><br>
+        <label>Longitude: <input type="number" id="longitude" step="0.000001" placeholder="-99.3959"></label><br>
+        <label>Search Radius (km): <input type="number" id="radius" value="10" min="1" max="100" style="width: 80px;"></label><br>
+        <button id="getTowers">🗼 Find Nearby Towers</button>
+    </div>
+    
     <div id="results"></div>
+    
+    <div id="towerInfo"></div>
+    
+    <div id="map"></div>
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
+        let map = null;
+        let markers = [];
+        const API_KEY = 'pk.53a83342c743a32ab8defc6ba8d94bb3';
+        
         // Dark mode toggle
         const toggle = document.getElementById('themeToggle');
         toggle.addEventListener('click', () => {
             const body = document.body;
             const isDark = body.getAttribute('data-theme') === 'dark';
             body.setAttribute('data-theme', isDark ? 'light' : 'dark');
-            toggle.textContent = isDark ? 'Dark' : 'Light';
+            toggle.textContent = isDark ? '🌙 Dark' : '☀️ Light';
             localStorage.setItem('theme', body.getAttribute('data-theme'));
         });
-
+        
         // Load saved theme
         const savedTheme = localStorage.getItem('theme') || 'dark';
         document.body.setAttribute('data-theme', savedTheme);
-        toggle.textContent = savedTheme === 'dark' ? 'Light' : 'Dark';
-
-        // Form handler
+        toggle.textContent = savedTheme === 'dark' ? '☀️ Light' : '🌙 Dark';
+        
+        // Get current location
+        document.getElementById('getLocation').addEventListener('click', () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        document.getElementById('latitude').value = position.coords.latitude.toFixed(6);
+                        document.getElementById('longitude').value = position.coords.longitude.toFixed(6);
+                    },
+                    (error) => {
+                        alert('Error getting location: ' + error.message);
+                    }
+                );
+            } else {
+                alert('Geolocation is not supported by your browser');
+            }
+        });
+        
+        // Find nearby towers
+        document.getElementById('getTowers').addEventListener('click', async () => {
+            const lat = parseFloat(document.getElementById('latitude').value);
+            const lon = parseFloat(document.getElementById('longitude').value);
+            const radius = parseFloat(document.getElementById('radius').value);
+            
+            if (isNaN(lat) || isNaN(lon)) {
+                alert('Please enter valid coordinates');
+                return;
+            }
+            
+            const towerInfoDiv = document.getElementById('towerInfo');
+            towerInfoDiv.style.display = 'block';
+            towerInfoDiv.innerHTML = '<div class="loading">🔍 Searching for nearby cell towers...</div>';
+            
+            try {
+                // OpenCelliD API endpoint
+                const url = `https://opencellid.org/ajax/searchCell.php?key=${API_KEY}&lat=${lat}&lon=${lon}&radius=${radius}&format=json`;
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.cells && data.cells.length > 0) {
+                    displayTowers(data.cells, lat, lon);
+                } else {
+                    towerInfoDiv.innerHTML = '<div class="error">No cell towers found in this area. Try increasing the search radius.</div>';
+                }
+            } catch (error) {
+                towerInfoDiv.innerHTML = `<div class="error">Error fetching tower data: ${error.message}</div>`;
+                console.error('Error:', error);
+            }
+        });
+        
+        function displayTowers(towers, userLat, userLon) {
+            const towerInfoDiv = document.getElementById('towerInfo');
+            const mapDiv = document.getElementById('map');
+            
+            // Sort by distance
+            towers.sort((a, b) => {
+                const distA = calculateDistance(userLat, userLon, a.lat, a.lon);
+                const distB = calculateDistance(userLat, userLon, b.lat, b.lon);
+                return distA - distB;
+            });
+            
+            // Display tower information
+            let html = `<h3>📡 Found ${towers.length} Cell Towers</h3>`;
+            towers.forEach((tower, index) => {
+                const distance = calculateDistance(userLat, userLon, tower.lat, tower.lon);
+                const radio = tower.radio ? tower.radio.toUpperCase() : 'Unknown';
+                html += `
+                    <div class="tower-item">
+                        <strong>Tower ${index + 1}</strong> - ${distance.toFixed(2)} km away<br>
+                        📶 Type: ${radio} | 
+                        🏢 MCC: ${tower.mcc || 'N/A'} | 
+                        📡 MNC: ${tower.mnc || 'N/A'} | 
+                        📍 Cell: ${tower.cell || 'N/A'}<br>
+                        📏 Coordinates: ${tower.lat.toFixed(6)}, ${tower.lon.toFixed(6)}<br>
+                        ${tower.range ? `📊 Range: ${tower.range}m` : ''}
+                    </div>
+                `;
+            });
+            towerInfoDiv.innerHTML = html;
+            
+            // Initialize or update map
+            mapDiv.style.display = 'block';
+            if (!map) {
+                map = L.map('map').setView([userLat, userLon], 12);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
+            } else {
+                map.setView([userLat, userLon], 12);
+                markers.forEach(m => map.removeLayer(m));
+                markers = [];
+            }
+            
+            // Add user location marker
+            const userMarker = L.marker([userLat, userLon], {
+                icon: L.icon({
+                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+                    iconSize: [25, 41],
+                    iconAnchor: [12, 41],
+                    popupAnchor: [1, -34],
+                    shadowSize: [41, 41]
+                })
+            }).addTo(map);
+            userMarker.bindPopup('<b>Your Location</b>');
+            markers.push(userMarker);
+            
+            // Add tower markers
+            towers.forEach((tower, index) => {
+                const distance = calculateDistance(userLat, userLon, tower.lat, tower.lon);
+                const radio = tower.radio ? tower.radio.toUpperCase() : 'Unknown';
+                
+                const towerMarker = L.marker([tower.lat, tower.lon], {
+                    icon: L.icon({
+                        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+                        iconSize: [25, 41],
+                        iconAnchor: [12, 41],
+                        popupAnchor: [1, -34],
+                        shadowSize: [41, 41]
+                    })
+                }).addTo(map);
+                
+                towerMarker.bindPopup(`
+                    <b>Tower ${index + 1}</b><br>
+                    Type: ${radio}<br>
+                    Distance: ${distance.toFixed(2)} km<br>
+                    Cell ID: ${tower.cell || 'N/A'}
+                `);
+                markers.push(towerMarker);
+            });
+            
+            // Fit map to show all markers
+            const group = L.featureGroup(markers);
+            map.fitBounds(group.getBounds().pad(0.1));
+        }
+        
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Earth's radius in km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                     Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                     Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+        
+        // Signal rating form handler
         document.getElementById('signalForm').addEventListener('submit', function(e) {
             e.preventDefault();
+            
             const vals = {
                 rssi: parseFloat(document.getElementById('rssi').value),
                 rsrp: parseFloat(document.getElementById('rsrp').value),
                 rsrq: parseFloat(document.getElementById('rsrq').value),
                 sinr: parseFloat(document.getElementById('sinr').value),
-                snr: parseFloat(document.getElementById('snr').value),
-                provider: document.getElementById('provider').value,
-                band: document.getElementById('band').value,
-                sigstrength: parseFloat(document.getElementById('sigstrength').value) || null,
-                sigstrengthpct: parseFloat(document.getElementById('sigstrengthpct').value) || null
+                snr: parseFloat(document.getElementById('snr').value)
             };
-
-            function rateRSSI(v) {
-                if (v <= -65) return { text: 'Excellent', cls: 'excellent' };
-                if (v < -75) return { text: 'Good', cls: 'good' };
-                if (v < -85) return { text: 'Fair', cls: 'fair' };
-                return { text: 'Poor', cls: 'poor' };
+            
+            function rateRSSI(v) { 
+                if (v <= -65) return {text: 'Excellent', cls: 'excellent'};
+                if (v <= -75) return {text: 'Good', cls: 'good'};
+                if (v <= -85) return {text: 'Fair', cls: 'fair'};
+                return {text: 'Poor', cls: 'poor'};
             }
-
             function rateRSRP(v) {
-                if (v <= -80) return { text: 'Excellent', cls: 'excellent' };
-                if (v < -95) return { text: 'Good', cls: 'good' };
-                if (v < -105) return { text: 'Fair', cls: 'fair' };
-                return { text: 'Poor', cls: 'poor' };
+                if (v >= -80) return {text: 'Excellent', cls: 'excellent'};
+                if (v >= -95) return {text: 'Good', cls: 'good'};
+                if (v >= -105) return {text: 'Fair', cls: 'fair'};
+                return {text: 'Poor', cls: 'poor'};
             }
-
             function rateRSRQ(v) {
-                if (v <= -6) return { text: 'Excellent', cls: 'excellent' };
-                if (v < -10) return { text: 'Good', cls: 'good' };
-                if (v < -15) return { text: 'Fair', cls: 'fair' };
-                return { text: 'Poor', cls: 'poor' };
+                if (v >= -6) return {text: 'Excellent', cls: 'excellent'};
+                if (v >= -10) return {text: 'Good', cls: 'good'};
+                if (v >= -15) return {text: 'Fair', cls: 'fair'};
+                return {text: 'Poor', cls: 'poor'};
             }
-
             function rateSINR(v) {
-                if (v >= 25) return { text: 'Excellent', cls: 'excellent' };
-                if (v >= 20) return { text: 'Good', cls: 'good' };
-                if (v >= 13) return { text: 'Fair', cls: 'fair' };
-                return { text: 'Poor', cls: 'poor' };
+                if (v >= 25) return {text: 'Excellent', cls: 'excellent'};
+                if (v >= 20) return {text: 'Good', cls: 'good'};
+                if (v >= 13) return {text: 'Fair', cls: 'fair'};
+                return {text: 'Poor', cls: 'poor'};
             }
-
             function rateSNR(v) {
-                if (v >= 25) return { text: 'Excellent', cls: 'excellent' };
-                if (v >= 18) return { text: 'Good', cls: 'good' };
-                if (v >= 10) return { text: 'Fair', cls: 'fair' };
-                return { text: 'Poor', cls: 'poor' };
+                if (v >= 25) return {text: 'Excellent', cls: 'excellent'};
+                if (v >= 18) return {text: 'Good', cls: 'good'};
+                if (v >= 10) return {text: 'Fair', cls: 'fair'};
+                return {text: 'Poor', cls: 'poor'};
             }
-
+            
             const rates = {
                 rssi: rateRSSI(vals.rssi),
                 rsrp: rateRSRP(vals.rsrp),
@@ -268,42 +397,29 @@
                 sinr: rateSINR(vals.sinr),
                 snr: rateSNR(vals.snr)
             };
-
+            
             const poorCount = Object.values(rates).filter(r => r.cls === 'poor').length;
             const fairCount = Object.values(rates).filter(r => r.cls === 'fair').length;
-            let overall = 'Excellent';
-            let cls = 'excellent';
-            if (poorCount >= 1 || fairCount >= 3) {
-                overall = 'Fair';
-                cls = 'fair';
-            }
-            if (poorCount >= 2 || fairCount >= 4) {
-                overall = 'Poor';
-                cls = 'poor';
-            }
-
-            let html = `<h3>Overall <span class="rating ${cls}">${overall}</span></h3>
-                <div class="rating ${rates.rsrq.cls}">RSRQ: ${vals.rsrq ? rates.rsrq.text : ''}</div>
-                <div class="rating ${rates.rsrp.cls}">RSRP: ${vals.rsrp ? rates.rsrp.text : ''}</div>
-                <div class="rating ${rates.rssi.cls}">RSSI: ${vals.rssi ? rates.rssi.text : ''}</div>
-                <div class="rating ${rates.snr.cls}">SNR: ${vals.snr ? rates.snr.text : ''}</div>
-                <div class="rating ${rates.sinr.cls}">SINR: ${vals.sinr ? rates.sinr.text : ''}</div>
+            let overall = 'Excellent'; let cls = 'excellent';
+            if (poorCount >= 1 || fairCount >= 3) { overall = 'Fair'; cls = 'fair'; }
+            if (poorCount >= 2 || fairCount >= 4) { overall = 'Poor'; cls = 'poor'; }
+            
+            let html = `
+                <h3>Overall: <span class="rating ${cls}">${overall}</span></h3>
+                <div class="rating ${rates.rsrq.cls}">RSRQ ${vals.rsrq || '?'}: ${rates.rsrq.text}</div>
+                <div class="rating ${rates.rsrp.cls}">RSRP ${vals.rsrp || '?'}: ${rates.rsrp.text}</div>
+                <div class="rating ${rates.rssi.cls}">RSSI ${vals.rssi || '?'}: ${rates.rssi.text}</div>
+                <div class="rating ${rates.snr.cls}">SNR ${vals.snr || '?'}: ${rates.snr.text}</div>
+                <div class="rating ${rates.sinr.cls}">SINR ${vals.sinr || '?'}: ${rates.sinr.text}</div>
                 <table>
                     <tr><th>Metric</th><th>Value</th><th>Rating</th></tr>
-                    <tr><td>RSRQ</td><td>${vals.rsrq || ''}</td><td>${rates.rsrq.text}</td></tr>
-                    <tr><td>RSRP</td><td>${vals.rsrp || ''}</td><td>${rates.rsrp.text}</td></tr>
-                    <tr><td>RSSI</td><td>${vals.rssi || ''}</td><td>${rates.rssi.text}</td></tr>
-                    <tr><td>SNR</td><td>${vals.snr || ''}</td><td>${rates.snr.text}</td></tr>
-                    <tr><td>SINR</td><td>${vals.sinr || ''}</td><td>${rates.sinr.text}</td></tr>`;
-
-            if (vals.provider || vals.band || vals.sigstrength || vals.sigstrengthpct) {
-                html += `<tr><td>Provider</td><td>${vals.provider}</td><td>${vals.band}</td></tr>`;
-                if (vals.sigstrength || vals.sigstrengthpct) {
-                    html += `<tr><td>Signal Strength</td><td>${vals.sigstrength || ''}</td><td>${vals.sigstrengthpct ? vals.sigstrengthpct + '%' : ''}</td></tr>`;
-                }
-            }
-
-            html += '</table>';
+                    <tr><td>RSRQ</td><td>${vals.rsrq || '?'}</td><td>${rates.rsrq.text}</td></tr>
+                    <tr><td>RSRP</td><td>${vals.rsrp || '?'}</td><td>${rates.rsrp.text}</td></tr>
+                    <tr><td>RSSI</td><td>${vals.rssi || '?'}</td><td>${rates.rssi.text}</td></tr>
+                    <tr><td>SNR</td><td>${vals.snr || '?'}</td><td>${rates.snr.text}</td></tr>
+                    <tr><td>SINR</td><td>${vals.sinr || '?'}</td><td>${rates.sinr.text}</td></tr>
+                </table>
+            `;
             document.getElementById('results').innerHTML = html;
         });
     </script>
